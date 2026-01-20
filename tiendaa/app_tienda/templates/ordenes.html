@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Módulo de Bodega: Gestión de Órdenes</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID Pedido</th>
+            <th>Cliente</th>
+            <th>Estado Actual</th>
+            <th>Productos</th>
+            <th>Acciones de Logística</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for pedido in pedidos %}
+        <tr>
+            <td>#{{ pedido.id }}</td>
+            <td>{{ pedido.cliente.username }}</td>
+            <td>
+                <span class="badge {% if pedido.estado == 'Entregado' %}bg-success{% else %}bg-warning{% endif %}">
+                    {{ pedido.estado }}
+                </span>
+            </td>
+            <td>
+                <ul>
+                    {% for item in pedido.items.all %}
+                    <li>{{ item.producto.nombre }} (Cant: {{ item.cantidad }})</li>
+                    {% endfor %}
+                </ul>
+            </td>
+            <td>
+                <form method="POST" action="{% url 'actualizar_estado_pedido' pedido.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <select name="estado">
+                        <option value="Pendiente" {% if pedido.estado == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+                        <option value="Enviado" {% if pedido.estado == 'Enviado' %}selected{% endif %}>Enviado</option>
+                        <option value="Entregado" {% if pedido.estado == 'Entregado' %}selected{% endif %}>Entregado</option>
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-primary">Actualizar</button>
+                </form>
+
+                <hr>
+
+                <button onclick="mostrarDevolucion('{{ pedido.id }}')" class="btn btn-sm btn-danger">Registrar Devolución</button>
+                
+                <div id="form-dev-{{ pedido.id }}" style="display:none; margin-top:10px; border: 1px solid red; padding: 5px;">
+                    <form method="POST" action="{% url 'registrar_devolucion' pedido.id %}">
+                        {% csrf_token %}
+                        <select name="producto_id" required>
+                            {% for item in pedido.items.all %}
+                            <option value="{{ item.producto.id }}">{{ item.producto.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="number" name="cantidad" placeholder="Cantidad" min="1" required style="width: 60px;">
+                        <button type="submit">Confirmar Retorno a Stock</button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+function mostrarDevolucion(id) {
+    var x = document.getElementById("form-dev-" + id);
+    x.style.display = x.style.display === "none" ? "block" : "none";
+}
+</script>
+{% endblock %}

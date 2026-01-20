@@ -4,17 +4,27 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
+            <div class="card shadow-lg login-card">
+                <div class="card-header">
                     <h3 class="mb-0">Añadir Nuevo Producto</h3>
+                    <p class="mb-0" style="font-size: 0.9rem; opacity: 0.9;">Gestión de Inventario - Bodega</p>
                 </div>
-                <div class="card-body">
-                    <form method="post">
+                
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data" class="custom-form">
                         {% csrf_token %}
-                        {{ form.as_p }}
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-success">Guardar Producto</button>
-                            <a href="{% url 'catalogo' %}" class="btn btn-secondary">Cancelar</a>
+                        
+                        <div class="form-container">
+                            {{ form.as_p }}
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary shadow-sm">
+                                Guardar Producto
+                            </button>
+                            <a href="{% url 'catalogo_publico' %}" class="btn btn-danger text-center">
+                                Cancelar
+                            </a>
                         </div>
                     </form>
                 </div>
@@ -22,4 +32,57 @@
         </div>
     </div>
 </div>
+
+<style>
+    /* Estilos extra para que el form.as_p use tus variables de CSS */
+    .form-container p {
+        margin-bottom: 1.2rem;
+    }
+
+    .form-container label {
+        display: block;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    /* Estilizamos los inputs generados por Django para que coincidan con tu CSS */
+    .form-container input, 
+    .form-container select, 
+    .form-container textarea {
+        display: block;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        color: var(--text-main);
+        background-color: #fff;
+        border: 1px solid var(--border-soft);
+        border-radius: 12px;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    .form-container input:focus {
+        border-color: var(--border-focus);
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(127, 198, 215, 0.25);
+    }
+
+    /* Estilo específico para el botón de elegir archivo (Imagen) */
+    input[type="file"] {
+        background-color: var(--background-main);
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .btn-danger {
+        text-decoration: none;
+        padding: 10px;
+        border-radius: 50px;
+        font-weight: 600;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
 {% endblock %}

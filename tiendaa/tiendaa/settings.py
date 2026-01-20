@@ -121,6 +121,6 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [ BASE_DIR / "static" ]
 
-LOGIN_REDIRECT_URL = 'catalogo'
+LOGIN_REDIRECT_URL = 'catalogo_publico'
 LOGOUT_ON_GET = True
-LOGOUT_REDIRECT_URL = 'catalogo'
+LOGOUT_REDIRECT_URL = 'catalogo_publico'

@@ -21,11 +21,13 @@ class RegistroForm(forms.ModelForm):
 class ProductoForm(forms.ModelForm):
     class Meta:
         model = Producto
-        fields = ['nombre', 'precio_base', 'stock']
+        # Asegúrate de agregar 'imagen' aquí adentro
+        fields = ['nombre', 'precio_base', 'stock', 'imagen'] 
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
-            'precio_base': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'precio_base': forms.NumberInput(attrs={'class': 'form-control'}),
             'stock': forms.NumberInput(attrs={'class': 'form-control'}),
+            'imagen': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
 
 

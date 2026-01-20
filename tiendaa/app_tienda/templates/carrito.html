@@ -22,28 +22,34 @@
                         </thead>
                         <tbody>
                             {% for item in carrito.values %}
-                            <tr>
-                                <td class="ps-4">
-                                    <span class="fw-bold text-dark">{{ item.nombre }}</span>
-                                </td>
-                                <td class="text-muted">${{ item.precio }}</td>
-                                <td>
-                                    <span class="badge bg-secondary px-3 py-2">{{ item.cantidad }}</span>
-                                </td>
-                                <td class="fw-bold">${{ item.subtotal_item }}</td>
-                                <td class="text-center">
-                                    <a href="{% url 'eliminar_carrito' item.id %}" class="btn btn-outline-danger btn-sm rounded-pill">
-                                        <i class="bi bi-trash"></i> Eliminar
-                                    </a>
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td class="ps-4">
+                                        <span class="fw-bold text-dark">{{ item.nombre }}</span>
+                                    </td>
+                                    <td class="text-muted">${{ item.precio }}</td>
+                                    <td>
+                                        <form action="{% url 'actualizar_carrito' item.id %}" method="post" class="d-flex align-items-center">
+                                            {% csrf_token %}
+                                            <input type="number" name="cantidad" value="{{ item.cantidad }}" 
+                                                min="1" max="{{ item.stock }}" 
+                                                class="form-control form-control-sm me-2" style="width: 70px;">
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">Ok</button>
+                                        </form>
+                                    </td>
+                                    <td class="fw-bold">${{ item.subtotal_item }}</td>
+                                    <td class="text-center">
+                                        <a href="{% url 'eliminar_carrito' item.id %}" class="btn btn-outline-danger btn-sm rounded-pill">
+                                            <i class="bi bi-trash"></i> Eliminar
+                                        </a>
+                                    </td>
+                                </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </div>
             
-            <a href="{% url 'catalogo' %}" class="btn btn-link text-decoration-none p-0">
+            <a href="{% url 'catalogo_publico' %}" class="btn btn-link text-decoration-none p-0">
                 <i class="bi bi-arrow-left"></i> Continuar comprando
             </a>
         </div>
@@ -74,6 +80,13 @@
                 <div class="mt-3 text-center">
                     <img src="https://v.fastcdn.co/u/652f1906/52774911-0-Payment-Methods.png" alt="Métodos de pago" class="img-fluid opacity-75" style="max-height: 30px;">
                 </div>
+                <script>
+                    function advertenciaLogin() {
+                        alert("¡Atención! Debes iniciar sesión para finalizar tu compra. Te redirigiremos al ingreso.");
+                        // El parámetro ?next=/checkout/ hace que después de loguearse vuelva al pago
+                        window.location.href = "{% url 'login' %}?next={% url 'checkout' %}";
+                    }
+                </script>
             </div>
         </div>
     </div>
@@ -83,7 +96,7 @@
         <div class="display-1 text-muted mb-4">🛒</div>
         <h3>Tu carrito está vacío</h3>
         <p class="text-muted">¿Aún no sabes qué comprar? ¡Tenemos miles de productos!</p>
-        <a href="{% url 'catalogo' %}" class="btn btn-primary btn-lg mt-3 px-5">Ir al catálogo</a>
+        <a href="{% url 'catalogo_publico' %}" class="btn btn-primary btn-lg mt-3 px-5">Ir al catálogo</a>
     </div>
     {% endif %}
 </div>

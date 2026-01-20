@@ -17,7 +17,7 @@ from django.contrib.auth import logout # Importante importar esto
 
 def logout_view(request):
     logout(request)
-    return redirect('catalogo')
+    return redirect('catalogo_publico')
 
 def ver_carrito(request):
     carrito = request.session.get('carrito', {})
@@ -33,12 +33,7 @@ def ver_carrito(request):
         'total': total
     })
 
-def eliminar_del_carrito(request, producto_id):
-    carrito = request.session.get('carrito', {})
-    if str(producto_id) in carrito:
-        del carrito[str(producto_id)]
-        request.session['carrito'] = carrito
-    return redirect('carrito')
+
 
 # Funciones de verificación de Rol
 def es_bodeguero(user):
@@ -74,13 +69,13 @@ def eliminar_producto(request, producto_id):
 @user_passes_test(es_bodeguero)
 def crear_producto(request):
     if request.method == 'POST':
-        form = ProductoForm(request.POST)
+        # IMPORTANTE: request.FILES es necesario para las imágenes
+        form = ProductoForm(request.POST, request.FILES) 
         if form.is_valid():
             form.save()
-            return redirect('catalogo') # Redirige al catálogo tras guardar
+            return redirect('catalogo_publico')
     else:
         form = ProductoForm()
-    
     return render(request, 'crear_producto.html', {'form': form})
 
 
@@ -170,7 +165,7 @@ def checkout_view(request):
     carrito = request.session.get('carrito', {})
 
     if not carrito:
-        return redirect('/catalogo/')
+        return redirect('/catalogo_publico/')
 
     if request.method == 'POST':
         direccion = request.POST.get('direccion')
@@ -283,10 +278,79 @@ def crear_empleado(request):
             return redirect('lista_usuarios') # O a donde prefieras
     else:
         form = CrearEmpleadoForm()
-    return render(request, 'usuarios/crear_empleado.html', {'form': form})
+    return render(request, 'crear_empleado.html', {'form': form})
 
 @user_passes_test(lambda u: u.is_superuser)
 def lista_usuarios(request):
     usuarios = User.objects.all().order_by('-date_joined')
-    return render(request, 'usuarios/lista_usuarios.html', {'usuarios': usuarios})
+    return render(request, 'lista_usuarios.html', {'usuarios': usuarios})
 
+# Añade esta vista para generar el documento de salida física
+@user_passes_test(es_bodeguero)
+def imprimir_orden_despacho(request, pedido_id):
+    pedido = get_object_or_404(Pedido, id=pedido_id)
+    # Obtenemos los productos asociados a ese pedido
+    items = PedidoProducto.objects.filter(pedido=pedido)
+    return render(request, 'bodega/orden_despacho_print.html', {
+        'pedido': pedido,
+        'items': items
+    })
+    
+def agregar_al_carrito(request, producto_id):
+    producto = get_object_or_404(Producto, id=producto_id)
+    carrito = request.session.get('carrito', {})
+
+    id_str = str(producto.id)
+    if id_str in carrito:
+        # Validar que no agregue más del stock disponible desde el catálogo
+        if carrito[id_str]['cantidad'] < producto.stock:
+            carrito[id_str]['cantidad'] += 1
+    else:
+        carrito[id_str] = {
+            'id': producto.id,
+            'nombre': producto.nombre,
+            'precio': str(producto.precio_base),
+            'cantidad': 1,
+            'stock': producto.stock, # <--- IMPORTANTE: Guardamos el stock aquí
+            'imagen': producto.imagen.url if producto.imagen else ''
+        }
+
+    request.session['carrito'] = carrito
+    return redirect('catalogo_publico')
+
+def eliminar_del_carrito(request, producto_id):
+    carrito = request.session.get('carrito', {})
+    if str(producto_id) in carrito:
+        del carrito[str(producto_id)]
+        request.session['carrito'] = carrito
+    return redirect('carrito')
+
+def actualizar_carrito(request, producto_id):
+    if request.method == 'POST':
+        cantidad = int(request.POST.get('cantidad', 1))
+        producto = get_object_or_404(Producto, id=producto_id)
+        carrito = request.session.get('carrito', {})
+
+        # Validación de Stock
+        if cantidad > producto.stock:
+            cantidad = producto.stock # Forzamos al máximo disponible
+
+        id_str = str(producto_id)
+        if id_str in carrito:
+            carrito[id_str]['cantidad'] = cantidad
+            request.session['carrito'] = carrito
+            
+    return redirect('carrito')
+
+def procesar_pago(request):
+    carrito = request.session.get('carrito', {})
+    
+    for item_id, item in carrito.items():
+        producto = Producto.objects.get(id=item['id'])
+        # Restamos del stock
+        producto.stock -= int(item['cantidad'])
+        producto.save()
+        
+    # Limpiamos el carrito después del pago
+    request.session['carrito'] = {}
+    return redirect('catalogo')

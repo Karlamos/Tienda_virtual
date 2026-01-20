@@ -17,6 +17,8 @@ class Producto(models.Model):
     nombre = models.CharField(max_length=200)
     precio_base = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.PositiveIntegerField()
+    # Este campo es el que activa el botón en el formulario
+    imagen = models.ImageField(upload_to='productos/', null=True, blank=True)
 
     def __str__(self):
         return self.nombre
@@ -65,3 +67,4 @@ class Devolucion(models.Model):
     motivo = models.TextField()
     fecha_devolucion = models.DateTimeField(auto_now_add=True)
     procesado = models.BooleanField(default=False)
+    

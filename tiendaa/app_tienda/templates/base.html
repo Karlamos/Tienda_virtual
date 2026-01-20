@@ -11,51 +11,50 @@
 
 
 <body> <header>
-        <nav class="navbar d-flex align-items-center justify-content-between px-5 py-3 border-bottom">
-            <div class="d-flex align-items-center">
-                <a class="navbar-brand d-flex align-items-center" href="/">
-                    <img src="{% static 'css/img/sky1.png' %}" 
-                        alt="Sky Logo" 
-                        height="50" 
-                        class="d-inline-block align-text-top">
-                </a>
-                <div class="nav-categories d-none d-lg-block ms-4">
-                    <a href="#" class="text-decoration-none px-2 text-dark fw-semibold small">SKINCARE</a>
+    <nav class="navbar d-flex align-items-center justify-content-between px-5 py-3 border-bottom">
+        <div class="d-flex align-items-center">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <img src="{% static 'css/img/sky1.png' %}" 
+                     alt="Sky Logo" 
+                     height="50" 
+                     class="d-inline-block align-text-top">
+            </a>
+            <div class="nav-categories d-none d-lg-block ms-4">
+                <a href="#" class="text-decoration-none px-2 text-dark fw-semibold small">SKINCARE</a>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+            <a href="{% url 'carrito' %}" class="btn btn-warning btn-sm rounded-pill px-3 fw-bold">
+                🛒 Carrito ({{ request.session.carrito|length|default:0 }})
+            </a>
+
+            {% if user.is_authenticated %}
+                <div class="text-end lh-1">
+                    <span class="saludo">¡Hola! </span><br>
+                    <span class="text-muted">{{ user.username }}</span>
                 </div>
-            </div>
 
-            <div class="d-flex align-items-center gap-3">
-
-                {% if user.is_authenticated %}
-                    <div class="text-end lh-1">
-                        <span class="saludo">¡Hola! </span><br>
-                        <span class="text-muted">{{ user.username }}</span>
-                    </div>
-
-                    <a href="{% url 'carrito' %}" class="btn btn-warning btn-sm rounded-pill px-3 fw-bold" >
-                        🛒 Carrito ({{ request.session.carrito|length|default:0 }})
+                {% if user.is_superuser %}
+                    <a href="{% url 'crear_empleado' %}" class="btn btn-outline-info btn-sm rounded-pill px-3 fw-bold">
+                        👤 Nuevo Usuario
                     </a>
-
-                    {% if user.is_superuser %}
-                        <a href="{% url 'crear_empleado' %}" class="btn btn-outline-info btn-sm rounded-pill px-3 fw-bold">
-                            👤 Nuevo Usuario
-                        </a>
-                    {% endif %}
-
-                    <form action="{% url 'logout' %}" method="POST">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold">Cerrar sesión</button>
-                    </form>
-
-                {% else %}
-                    <a href="{% url 'login' %}" class="btn btn-primary">🔑 Ingresar</a>
                 {% endif %}
-            </div>
-        </nav>
-    </header>
+
+                <form action="{% url 'logout' %}" method="POST" class="m-0">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold">Cerrar sesión</button>
+                </form>
+
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold">🔑 Ingresar</a>
+            {% endif %}
+        </div>
+    </nav>
+</header>
 
 <section class="newsletter-banner">
-    <img src="static/css/img/skincare.PNG" alt="Skincare Banner" class="img-banner-full">
+    <img src="static/css/img/banner_skincare.png" alt="Skincare Banner" class="img-banner-full">
 </section>>
 
 <div class="container my-5">
