@@ -1,0 +1,8 @@
+{% extends "base.html"%}
+{% block contenido%}
+<h2>Panel de Control Financiero</h2>
+<div class="cuadro-reporte">
+    <p><strong>Total Ingresos:</strong> ${{ ingresos }}</p>
+    <p><strong>Facturas Pendientes:</strong> {{ pendientes }}</p>
+</div>
+{% endblock%}

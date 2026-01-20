@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<h2>📦 Checkout</h2>
+
+{% if error %}
+<div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+
+    <div class="mb-3">
+        <label>Dirección de envío</label>
+        <textarea name="direccion" class="form-control" required></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label>Cupón</label>
+        <input type="text" name="cupon" class="form-control">
+    </div>
+
+    <button class="btn btn-primary">Confirmar pedido</button>
+</form>
+
+{% endblock %}

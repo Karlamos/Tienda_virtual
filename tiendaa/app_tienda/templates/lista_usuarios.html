@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Gestión de Usuarios y Roles</h2>
+        <a href="{% url 'crear_empleado' %}" class="btn btn-success">
+            👤 Nuevo Empleado
+        </a>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Email</th>
+                        <th>Rol / Grupo</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td><strong>{{ usuario.username }}</strong></td>
+                        <td>{{ usuario.email }}</td>
+                        <td>
+                            {% for grupo in usuario.groups.all %}
+                                <span class="badge bg-info text-dark">{{ grupo.name }}</span>
+                            {% empty %}
+                                <span class="badge bg-secondary">Sin Rol (Cliente)</span>
+                            {% endfor %}
+                            {% if usuario.is_superuser %}
+                                <span class="badge bg-danger">Superusuario</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if usuario.is_active %}
+                                <span class="text-success">● Activo</span>
+                            {% else %}
+                                <span class="text-danger">● Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">Editar</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+<nav>
+    <a href="{% url 'catalogo' %}">Tienda</a>
+    
+    {% if user.is_authenticated %}
+        <a href="{% url 'carrito' %}">Mi Carrito</a>
+
+        {% if user.groups.all.0.name == 'Bodeguero' or user.is_superuser %}
+            <a href="{% url 'gestion_bodega' %}" style="color: orange;">📦 Panel Bodega</a>
+        {% endif %}
+
+        {% if user.groups.all.0.name == 'Financiero' or user.is_superuser %}
+            <a href="{% url 'reporte_financiero' %}" style="color: green;">💰 Panel Financiero</a>
+        {% endif %}
+
+        <span>Hola, {{ user.username }}</span>
+        <a href="{% url 'logout' %}">Salir</a>
+    {% else %}
+        <a href="{% url 'login' %}">Iniciar Sesión</a>
+    {% endif %}
+</nav>

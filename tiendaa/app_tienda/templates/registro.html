@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block contenido %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-success text-white text-center py-3">
+                <h3 class="mb-0">Crear cuenta</h3>
+                <small>Únete a nuestra comunidad hoy mismo</small>
+            </div>
+            
+            <div class="card-body p-4">
+                {% if form.errors %}
+                    <div class="alert alert-danger shadow-sm">
+                        <p class="mb-0"><strong>Revisa los siguientes errores:</strong></p>
+                        <ul class="mb-0 small">
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Usuario</label>
+                        {{ form.username|add_class:"form-control shadow-sm" }}
+                        <div class="form-text text-muted small">Nombre único para identificarte.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Correo electrónico</label>
+                        {{ form.email|add_class:"form-control shadow-sm" }}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Contraseña</label>
+                            {{ form.password|add_class:"form-control shadow-sm" }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Confirmar</label>
+                            {{ form.password2|add_class:"form-control shadow-sm" }}
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-3">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-person-plus-fill"></i> Registrarse
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card-footer text-center bg-white py-3">
+                <p class="mb-1">¿Ya tienes una cuenta?</p>
+                <a href="{% url 'login' %}" class="btn btn-outline-primary btn-sm">
+                    Inicia sesión aquí
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

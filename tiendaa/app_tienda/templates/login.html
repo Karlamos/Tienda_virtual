@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block contenido %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card shadow-lg border-0 login-card">
+
+            <div class="card-header text-center py-3">
+                <h3 class="mb-0">Iniciar Sesión</h3>
+                <small>¡Qué bueno verte de nuevo!</small>
+            </div>
+
+            <div class="card-body p-4">
+
+                {% if form.errors %}
+                <div class="alert alert-danger text-center">
+                    Usuario o contraseña incorrectos
+                </div>
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Usuario</label>
+                        {{ form.username|add_class:"form-control form-control-lg" }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Contraseña</label>
+                        {{ form.password|add_class:"form-control form-control-lg" }}
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            Entrar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card-footer text-center bg-white py-3">
+                <p class="mb-1 text-muted">¿No tienes cuenta?</p>
+                <a href="{% url 'registro' %}" class="fw-bold">Regístrate aquí</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

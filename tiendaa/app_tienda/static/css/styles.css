@@ -1,0 +1,268 @@
+/* =========================================================
+   PALETA DE COLORES SUAVES (SKINCARE / CLEAN UI)
+   ========================================================= */
+:root {
+    --primary: #7FC6D7;
+    --primary-soft: #E0F3F7;
+    --primary-hover: #9BC7EC;
+
+    --background-main: #F5F8F9;
+    --background-card: #F3FDFE;
+
+    --border-soft: #C9E1E6;
+    --border-focus: #ABDAE2;
+
+    --text-main: #2c3e50;
+    --text-muted: #6c757d;
+}
+
+/* =========================================================
+   BASE
+   ========================================================= */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background-color: var(--background-main);
+    color: var(--text-main);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* =========================================================
+   HEADER / NAVBAR
+   ========================================================= */
+.navbar {
+    background-color: #CEEDED !important;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    color: #2c3e50 !important;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+footer {
+    background-color: #DFEEF3;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+/* =========================================================
+   BOTONES
+   ========================================================= */
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: #ffffff;
+}
+.btn-warning {
+    background-color: #C4E5FB;
+    border: none;
+    color: #2c3e50;
+}
+
+.btn-warning:hover {
+    background-color: #9BC7EC;
+}
+.btn-danger {
+    background-color: #B8DBDE;
+    border: none;
+    color: #2c3e50;
+}
+
+.btn-danger:hover {
+    background-color: #ABDAE2;
+}
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+}
+
+/* =========================================================
+   CARDS
+   ========================================================= */
+.card {
+    border-radius: 16px;
+    border: 1px solid var(--border-soft);
+    background-color: var(--background-card);
+}
+
+.card-header {
+    border-bottom: none;
+}
+
+/* =========================================================
+   FORMULARIOS
+   ========================================================= */
+.form-control {
+    border-radius: 12px;
+    border: 1px solid var(--border-soft);
+    padding: 0.75rem 1rem;
+}
+
+.form-control:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 0.2rem rgba(127, 198, 215, 0.25);
+}
+
+/* =========================================================
+   LOGIN
+   ========================================================= */
+.login-card {
+    overflow: hidden;
+}
+
+.login-card .card-header {
+    background-color: var(--primary);
+    color: white;
+    text-align: center;
+}
+
+.login-card .card-header h3 {
+    margin-bottom: 0.25rem;
+}
+
+.login-card .card-body {
+    background-color: var(--background-card);
+}
+
+.login-card .card-footer {
+    background-color: var(--background-card);
+}
+
+.login-card a {
+    color: var(--primary-hover);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.login-card a:hover {
+    text-decoration: underline;
+}
+
+/* =========================================================
+   ALERTAS
+   ========================================================= */
+.alert-danger {
+    border-radius: 12px;
+    font-size: 0.95rem;
+}
+
+/* =========================================================
+   UTILIDADES
+   ========================================================= */
+.shadow-lg {
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.12) !important;
+}
+/* ===============================
+   BOTÓN LOGIN – PALETA PASTEL
+   =============================== */
+
+.login-card .btn-primary {
+    background-color: #7FC6D7 !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 600;
+    border-radius: 50px;
+    padding: 14px;
+    transition: all 0.3s ease;
+}
+
+.login-card .btn-primary:hover {
+    background-color: #9BC7EC !important;
+    transform: scale(1.03);
+    box-shadow: 0 6px 12px rgba(155, 199, 236, 0.4);
+}
+
+.btn-warning,
+.btn-danger,
+.btn-primary {
+    border: none !important;
+}
+.newsletter-banner {
+    background-color: #a2d2df; /* El color azul claro de tu imagen */
+    padding: 60px 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.newsletter-left h2 {
+    font-size: 2.5rem;
+    line-height: 1.1;
+    letter-spacing: 1px;
+}
+
+.newsletter-right {
+    width: 40%;
+}
+
+/* Para que el input se vea circular y traslúcido como en la foto */
+.newsletter-right .rounded-pill {
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 1px solid white !important;
+}
+
+.newsletter-right input::placeholder {
+    color: white;
+    opacity: 0.8;
+}
+.newsletter-banner {
+    display: flex;
+    align-items: center;
+    overflow: hidden; /* Para que la imagen no se salga de los bordes si hay bordes redondeados */
+    background-color: #a2d2df; /* El color azul que tienes de fondo */
+    min-height: 250px; /* Ajusta la altura según necesites */
+}
+
+.newsletter-left {
+    flex: 1;
+    height: 100%;
+}
+
+.img-newsletter {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Esto hace que la imagen llene el espacio sin estirarse */
+    display: block;
+}
+
+.newsletter-right {
+    flex: 1;
+    padding: 20px; /* Espacio para que el input no pegue con la imagen */
+}
+.newsletter-banner {
+    width: 100%;
+    line-height: 0; /* Elimina espacios vacíos debajo de la imagen */
+    overflow: hidden;
+}
+
+.img-banner-full {
+    width: 100%;
+    height: auto; /* Mantiene la proporción de la imagen */
+    display: block;
+    /* Si quieres que tenga una altura fija (ej. 300px) usa lo siguiente: */
+    /* height: 300px; */
+    /* object-fit: cover; */
+}
+/* Esto obliga a la imagen a ocupar todo el ancho del contenedor */
+.img-banner-full {
+    width: 100%;
+    height: auto;
+    display: block;
+    min-height: 200px; /* Prueba dándole una altura mínima temporal para ver si aparece */
+    object-fit: cover;
+}
+
+.newsletter-banner {
+    width: 100%;
+    display: block;
+    padding: 0;
+    margin: 0;
+}

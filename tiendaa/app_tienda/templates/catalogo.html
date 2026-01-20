@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<h2 class="mb-4 text-center">Nuestros Productos</h2>
+{% if user.is_authenticated and user.groups.all.0.name == 'Bodeguero' or user.is_superuser %}
+    <div class="text-end mb-4">
+        <a href="{% url 'crear_producto' %}" class="btn btn-success">
+            ✨ Nuevo Producto
+        </a>
+    </div>
+{% endif %}
+<div class="row">
+    {% for producto in productos %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ producto.nombre }}</h5>
+                    <p class="card-text">
+                        Precio: <strong>${{ producto.precio_base }}</strong><br>
+                        Stock: {{ producto.stock }}
+                    </p>
+
+                    <a href="{% url 'agregar_carrito' producto.id %}" class="btn btn-primary w-100 mb-2">
+                        ➕ Agregar al carrito
+                    </a>
+
+                    {% if user.is_authenticated and user.groups.all.0.name == 'Bodeguero' or user.is_superuser %}
+                        <div class="d-flex gap-2 border-top pt-2">
+                            <a href="{% url 'editar_producto' producto.id %}" class="btn btn-outline-warning btn-sm flex-fill">
+                                ✏️ Editar
+                            </a>
+                            <a href="{% url 'eliminar_producto' producto.id %}" class="btn btn-outline-danger btn-sm flex-fill">
+                                🗑️ Borrar
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p class="text-center">No hay productos disponibles.</p>
+    {% endfor %}
+</div>
+
+{% endblock %}
