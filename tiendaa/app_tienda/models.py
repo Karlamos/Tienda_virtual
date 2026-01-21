@@ -28,8 +28,12 @@ class Producto(models.Model):
 
 class Cupon(models.Model):
     codigo = models.CharField(max_length=20, unique=True)
-    descuento_porcentaje = models.IntegerField()
+    descuento_porcentaje = models.PositiveIntegerField(help_text="Porcentaje de descuento (ej: 15)")
     activo = models.BooleanField(default=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.codigo} (-{self.descuento_porcentaje}%)"
 
 class Pedido(models.Model):
 
@@ -53,6 +57,9 @@ class PedidoProducto(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
     cantidad = models.PositiveIntegerField()
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
+    @property
+    def subtotal_linea(self):
+        return self.cantidad * self.precio_unitario
 
 
 class Factura(models.Model):

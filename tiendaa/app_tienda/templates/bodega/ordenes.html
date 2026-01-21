@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Bodega</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #F5F8F9; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 8px; border: 1px solid #AFD6F8; }
+        h2 { color: #7FC6D7; border-bottom: 2px solid #9BC7EC; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background-color: #9BC7EC; color: white; padding: 12px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #CEEAF6; }
+        .btn-despacho { color: #7FC6D7; text-decoration: none; font-weight: bold; border: 1px solid #7FC6D7; padding: 5px 10px; border-radius: 4px; }
+        .btn-despacho:hover { background: #7FC6D7; color: white; }
+        .estado-pill { padding: 4px 8px; border-radius: 12px; font-size: 0.85em; font-weight: bold; }
+        .Pendiente { background: #E2F1F7; color: #5a8da0; }
+        .Enviado { background: #AFD6F8; color: white; }
+        .Entregado { background: #CEEDED; color: #4a90a4; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📦 Módulo de Bodega y Logística</h2>
+    <p>Visualización centralizada de compras para despacho.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Pedido</th>
+                <th>Cliente</th>
+                <th>Dirección</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pedido in pedidos %}
+            <tr>
+                <td>#00{{ pedido.id }}</td>
+                <td>{{ pedido.cliente.username }}</td>
+                <td>{{ pedido.direccion_envio }}</td>
+                <td>
+                    <span class="estado-pill {{ pedido.estado }}">{{ pedido.estado }}</span>
+                </td>
+                <td>
+                    <form action="{% url 'actualizar_estado_pedido' pedido.id %}" method="POST" style="display: inline;">
+                        {% csrf_token %}
+                        <select name="estado" onchange="this.form.submit()" style="padding: 5px; border-radius: 4px; border: 1px solid #9BC7EC;">
+                            <option value="Pendiente" {% if pedido.estado == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+                            <option value="Enviado" {% if pedido.estado == 'Enviado' %}selected{% endif %}>Enviado</option>
+                            <option value="Entregado" {% if pedido.estado == 'Entregado' %}selected{% endif %}>Entregado</option>
+                        </select>
+                    </form>
+
+                    <a href="{% url 'imprimir_orden_despacho' pedido.id %}" class="btn-despacho" style="margin-left: 10px;">
+                        Generar Salida
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 20px;">No hay pedidos registrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div style="margin-top: 20px;">
+        <a href="{% url 'catalogo_publico' %}" style="color: #9BC7EC;">← Volver al Catálogo</a>
+    </div>
+</div>
+
+</body>
+</html>
+{% endblock %}

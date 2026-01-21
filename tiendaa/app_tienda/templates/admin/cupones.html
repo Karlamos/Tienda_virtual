@@ -1,0 +1,56 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Cupones</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #F5F8F9; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; border: 1px solid #AFD6F8; }
+        h2 { color: #7FC6D7; border-bottom: 2px solid #9BC7EC; padding-bottom: 10px; }
+        .form-group { margin-bottom: 15px; }
+        input { padding: 8px; border: 1px solid #9BC7EC; border-radius: 4px; width: 100%; box-sizing: border-box; }
+        button { background-color: #7FC6D7; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background-color: #E2F1F7; color: #5a8da0; padding: 10px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #F3FDFE; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>🎟️ Generar Cupones de Descuento</h2>
+    
+    <form method="POST" action="{% url 'gestionar_cupones' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Código del Cupón (Ej: DESCUENTO2026)</label>
+            <input type="text" name="codigo" required placeholder="Escribe el código aquí">
+        </div>
+        <div class="form-group">
+            <label>Porcentaje de Descuento (%)</label>
+            <input type="number" name="descuento" min="1" max="100" required>
+        </div>
+        <button type="submit">Generar Cupón</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Descuento</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cupon in cupones %}
+            <tr>
+                <td><strong>{{ cupon.codigo }}</strong></td>
+                <td>{{ cupon.descuento_porcentaje }}%</td>
+                <td>{% if cupon.activo %}Activo ✅{% else %}Inactivo ❌{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

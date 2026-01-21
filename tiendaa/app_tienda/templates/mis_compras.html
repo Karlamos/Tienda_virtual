@@ -1,0 +1,70 @@
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mis Compras</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #F5F8F9; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 12px; border: 1px solid #AFD6F8; }
+        h2 { color: #7FC6D7; border-bottom: 3px solid #9BC7EC; padding-bottom: 10px; }
+        .pedido-card { 
+            border: 1px solid #CEEAF6; padding: 20px; margin-bottom: 15px; 
+            border-radius: 8px; display: flex; justify-content: space-between; align-items: center;
+            background-color: #F3FDFE;
+        }
+        .info h3 { margin: 0; color: #9BC7EC; }
+        .status { 
+            padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9em;
+        }
+        /* Colores dinámicos según el estado */
+        .Pendiente { background-color: #E2F1F7; color: #5a8da0; }
+        .Enviado { background-color: #AFD6F8; color: white; }
+        .Entregado { background-color: #CEEDED; color: #4a90a4; }
+        
+        .btn-factura { 
+            text-decoration: none; color: #7FC6D7; border: 1px solid #7FC6D7; 
+            padding: 8px 12px; border-radius: 5px; font-size: 0.8em;
+        }
+        .btn-factura:hover { background: #7FC6D7; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🛍️ Mi Historial de Compras</h2>
+    <p>Aquí puedes rastrear el estado de tus pedidos en tiempo real.</p>
+
+    {% for pedido in pedidos %}
+    <div class="pedido-card">
+        <div class="info">
+            <h3>Pedido #00{{ pedido.id }}</h3>
+            <p style="margin: 5px 0; color: #666;">Fecha: {{ pedido.fecha|date:"d/m/Y" }}</p>
+            <p style="margin: 5px 0;"><strong>Total: ${{ pedido.total }}</strong></p>
+        </div>
+        
+        <div style="text-align: right;">
+            <div class="status {{ pedido.estado }}" style="margin-bottom: 10px;">
+                {{ pedido.estado|upper }}
+            </div>
+            
+            <a href="{% url 'ver_factura' pedido.id %}" class="btn-factura">
+                ver Factura Digital
+            </a>
+        </div>
+    </div>
+    {% empty %}
+    <div style="text-align: center; padding: 40px;">
+        <p>Aún no has realizado ninguna compra.</p>
+        <a href="{% url 'catalogo_publico' %}" style="color: #9BC7EC;">Ir a la tienda</a>
+    </div>
+    {% endfor %}
+
+    <div style="margin-top: 20px;">
+        <a href="{% url 'catalogo_publico' %}" style="color: #9BC7EC;">← Volver al Catálogo</a>
+    </div>
+</div>
+
+</body>
+</html>

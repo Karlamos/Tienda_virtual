@@ -1,0 +1,44 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Configuración de IVA</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #F5F8F9; padding: 20px; }
+        .container { max-width: 500px; margin: 50px auto; background: white; padding: 30px; border-radius: 12px; border: 1px solid #AFD6F8; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        h2 { color: #7FC6D7; border-bottom: 2px solid #9BC7EC; padding-bottom: 10px; margin-top: 0; }
+        .info-box { background-color: #E2F1F7; color: #5a8da0; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9em; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #666; }
+        input[type="number"] { width: 100%; padding: 12px; border: 1px solid #9BC7EC; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; background-color: #7FC6D7; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+        button:hover { background-color: #9BC7EC; }
+        .back-link { display: block; text-align: center; margin-top: 15px; color: #9BC7EC; text-decoration: none; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>⚙️ Configuración de IVA</h2>
+    
+    <div class="info-box">
+        <strong>IVA Actual:</strong> {{ config.porcentaje }}%
+        <br>
+        <small>Este cambio afectará a todas las compras nuevas desde este momento.</small>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="porcentaje">Nuevo Porcentaje de IVA (%):</label>
+            <input type="number" name="porcentaje" id="porcentaje" step="0.01" min="0" max="100" placeholder="Ej: 15.00" required>
+        </div>
+        <button type="submit">Actualizar Impuesto</button>
+    </form>
+
+    <a href="{% url 'reporte_financiero' %}" class="back-link">← Volver al Reporte</a>
+</div>
+
+</body>
+</html>

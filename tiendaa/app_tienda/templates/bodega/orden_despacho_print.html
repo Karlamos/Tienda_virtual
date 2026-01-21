@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load mathfilters %}
+
+{% block contenido %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Orden_Despacho_{{ pedido.id }}</title>
+    <style>
+        body { font-family: sans-serif; padding: 40px; }
+        .header { border-bottom: 2px solid #333; margin-bottom: 20px; }
+        .box { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; background: #f9f9f9; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #eee; }
+        .no-print { text-align: center; margin-top: 20px; }
+        @media print { .no-print { display: none; } }
+    </style>
+</head>
+<body onload="window.print()">
+    <div class="header">
+        <h1>ORDEN DE SALIDA DE BODEGA</h1>
+        <p><strong>Pedido Relacionado:</strong> #00{{ pedido.id }} | <strong>Fecha:</strong> {{ pedido.fecha }}</p>
+    </div>
+
+    <div class="box">
+        <strong>DESTINATARIO:</strong> {{ pedido.cliente.get_full_name|default:pedido.cliente.username }}<br>
+        <strong>DIRECCIÓN DE ENVÍO:</strong> {{ pedido.direccion_envio }}
+    </div>
+
+    <h3>PRODUCTOS A DESPACHAR:</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>SKU/ID</th>
+                <th>Nombre del Producto</th>
+                <th>Cantidad Física</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.producto.id }}</td>
+                <td>{{ item.producto.nombre }}</td>
+                <td style="font-size: 20px; font-weight: bold;">{{ item.cantidad }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div style="margin-top: 50px; display: flex; justify-content: space-between;">
+        <div style="border-top: 1px solid #000; width: 200px; text-align: center;"><br>Firma Bodeguero</div>
+        <div style="border-top: 1px solid #000; width: 200px; text-align: center;"><br>Fecha Salida</div>
+    </div>
+
+    <div class="no-print">
+        <button onclick="window.print()">Imprimir Orden</button>
+        <a href="{% url 'gestion_bodega' %}">Volver a Bodega</a>
+    </div>
+</body>
+</html>
+{% endblock %}

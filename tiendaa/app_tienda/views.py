@@ -4,13 +4,15 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required, user_passes_test
 from decimal import Decimal
 from django.contrib.auth.models import Group
+from django.contrib.auth.models import User
 from .models import (
     Pedido, Producto, Cupon,
     ConfiguracionIVA, PedidoProducto, Factura, Devolucion
 )
 from .forms import *
 from django.contrib.auth.decorators import user_passes_test
-from django.contrib.auth import logout # Importante importar esto
+from django.contrib.auth import logout 
+from django.contrib.admin.views.decorators import staff_member_required
 
 
 
@@ -83,7 +85,7 @@ def crear_producto(request):
 @user_passes_test(es_bodeguero)
 def gestion_bodega(request):
     pedidos = Pedido.objects.all().order_by('-fecha')
-    return render(request, 'ordenes.html', {'pedidos': pedidos})
+    return render(request, 'bodega/ordenes.html', {'pedidos': pedidos})
 
 @user_passes_test(es_bodeguero)
 def procesar_despacho(request, pedido_id):
@@ -126,13 +128,29 @@ def configuracion_iva(request):
         nuevo_iva = request.POST.get('porcentaje')
         ConfiguracionIVA.objects.create(porcentaje=nuevo_iva) # Creamos uno nuevo para mantener historial
         return redirect('configuracion_iva')
-    return render(request, 'financiero/iva.html', {'config': config})
+    return render(request, 'financiero/configurar_iva.html', {'config': config})
 
 # --- VISTAS DE ADMINISTRADOR ---
 @user_passes_test(es_administrador)
+@user_passes_test(lambda u: u.groups.filter(name='Administrador').exists() or u.is_superuser)
 def gestionar_cupones(request):
-    cupones = Cupon.objects.all()
-    # Lógica para crear o desactivar cupones
+    if request.method == 'POST':
+        # .strip() elimina espacios accidentales
+        codigo = request.POST.get('codigo', '').strip().upper()
+        porcentaje = request.POST.get('descuento')
+
+        if codigo and porcentaje:
+            # Usamos update_or_create para evitar errores si el código se repite
+            # o simplemente .create()
+            Cupon.objects.create(
+                codigo=codigo, 
+                descuento_porcentaje=int(porcentaje),
+                activo=True
+            )
+            return redirect('gestionar_cupones') # Recarga la página para mostrar el nuevo
+
+    # Obtenemos todos los cupones para mostrarlos en la tabla
+    cupones = Cupon.objects.all().order_by('-fecha_creacion')
     return render(request, 'admin/cupones.html', {'cupones': cupones})
 
 def registro_view(request):
@@ -354,3 +372,143 @@ def procesar_pago(request):
     # Limpiamos el carrito después del pago
     request.session['carrito'] = {}
     return redirect('catalogo')
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+# (Mantén tus otros imports igual)
+
+@login_required(login_url='/login/')
+def checkout_view(request):
+    carrito = request.session.get('carrito', {})
+
+    if not carrito:
+        return redirect('/catalogo_publico/')
+
+    if request.method == 'POST':
+        direccion = request.POST.get('direccion')
+        # Limpiamos el código del cupón (quitar espacios y poner en mayúsculas)
+        codigo_cupon = request.POST.get('cupon', '').strip().upper()
+
+        if not direccion:
+            return render(request, 'checkout.html', {
+                'error': 'La dirección es obligatoria',
+                'carrito': carrito
+            })
+
+        subtotal = Decimal('0.00')
+        for item in carrito.values():
+            subtotal += Decimal(str(item['precio'])) * item['cantidad']
+
+        # 1. LÓGICA DE CUPÓN: Validar si existe y está activo
+        descuento = Decimal('0.00')
+        if codigo_cupon:
+            try:
+                cupon_obj = Cupon.objects.get(codigo=codigo_cupon, activo=True)
+                # Calculamos el porcentaje sobre el subtotal
+                descuento = (subtotal * Decimal(str(cupon_obj.descuento_porcentaje / 100))).quantize(Decimal('0.01'))
+            except Cupon.DoesNotExist:
+                # Si el cupón no es válido, el descuento sigue en 0
+                pass
+
+        # 2. IVA DINÁMICO: Se aplica sobre el subtotal ya descontado
+        iva_config = ConfiguracionIVA.objects.last()
+        iva_porcentaje = iva_config.porcentaje if iva_config else Decimal('15.00')
+        
+        # El impuesto se calcula sobre (Subtotal - Descuento)
+        base_imponible = subtotal - descuento
+        iva_valor = (base_imponible * (iva_porcentaje / 100)).quantize(Decimal('0.01'))
+
+        # 3. TOTAL FINAL (Redondeado a 2 decimales para evitar el error de tus fotos)
+        total = (base_imponible + iva_valor).quantize(Decimal('0.01'))
+
+        # 4. CREAR EL PEDIDO
+        pedido = Pedido.objects.create(
+            cliente=request.user,
+            direccion_envio=direccion,
+            iva_aplicado=iva_porcentaje,
+            subtotal=subtotal,
+            descuento=descuento,
+            total=total
+        )
+
+        # 5. GUARDAR PRODUCTOS Y ACTUALIZAR STOCK
+        for item in carrito.values():
+            producto = Producto.objects.get(id=item['id'])
+            PedidoProducto.objects.create(
+                pedido=pedido,
+                producto=producto,
+                cantidad=item['cantidad'],
+                precio_unitario=item['precio']
+            )
+            producto.stock -= item['cantidad']
+            producto.save()
+
+        # 6. REGISTRO DE FACTURA
+        Factura.objects.create(
+            pedido=pedido,
+            documento_digital='facturas/factura_placeholder.pdf'
+        )
+
+        # Limpiar carrito y enviar datos a la confirmación
+        request.session['carrito'] = {}
+
+        return render(request, 'confirmacion.html', {
+            'pedido': pedido,
+            'iva_total': iva_valor # Pasamos el IVA calculado para el diseño
+        })
+
+    return render(request, 'checkout.html', {'carrito': carrito})
+
+# Vista para la Factura Digital (Módulo 3.1)
+@login_required
+def ver_factura(request, pedido_id):
+# Traemos el pedido (solo si pertenece al usuario logueado)
+    pedido = get_object_or_404(Pedido, id=pedido_id, cliente=request.user)
+    
+    # Calculamos el IVA total para que se muestre correctamente en el diseño
+    # Basado en la lógica de tu checkout
+    iva_total = (pedido.subtotal - pedido.descuento) * (pedido.iva_aplicado / 100)
+    
+    # USAMOS confirmacion.html porque ya tiene tu diseño y colores
+    return render(request, 'confirmacion.html', {
+        'pedido': pedido,
+        'iva_total': iva_total
+    })
+
+# Reporte Financiero Completo (Módulo 3.3)
+@user_passes_test(es_financiero)
+def reporte_financiero(request):
+    # Cálculos globales (Resumen de las tarjetas)
+    ingresos_reales = Pedido.objects.filter(estado='Entregado').aggregate(Sum('total'))['total__sum'] or Decimal('0.00')
+    por_cobrar = Pedido.objects.exclude(estado='Entregado').aggregate(Sum('total'))['total__sum'] or Decimal('0.00')
+    
+    # Cálculo de pérdidas por devoluciones
+    from django.db.models import F
+    devoluciones_monto = Devolucion.objects.aggregate(
+        total=Sum(F('cantidad') * F('producto__precio_base'))
+    )['total'] or Decimal('0.00')
+    
+    # Lista de TODAS las facturas para la tabla del template
+    todas_las_facturas = Pedido.objects.all().order_by('-fecha')
+    
+    return render(request, 'financiero/reporte.html', {
+        'ingresos': ingresos_reales,
+        'pendientes_monto': por_cobrar,
+        'devoluciones_monto': devoluciones_monto,
+        'facturas': todas_las_facturas  # Esta es la lista que recorreremos
+    })
+
+
+
+@login_required(login_url='/login/')
+def mis_compras(request):
+    # Obtenemos solo los pedidos del usuario actual, ordenados por los más recientes
+    pedidos = Pedido.objects.filter(cliente=request.user).order_by('-fecha')
+    return render(request, 'mis_compras.html', {'pedidos': pedidos})
+
+@staff_member_required
+def alternar_estado_usuario(request, usuario_id):
+    usuario = get_object_or_404(User, id=usuario_id)
+    # Cambia el estado al opuesto
+    usuario.is_active = not usuario.is_active
+    usuario.save()
+    return redirect('lista_usuarios')

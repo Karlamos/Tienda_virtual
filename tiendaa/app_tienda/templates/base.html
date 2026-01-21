@@ -30,14 +30,15 @@
             </a>
 
             {% if user.is_authenticated %}
-                <div class="text-end lh-1">
-                    <span class="saludo">¡Hola! </span><br>
-                    <span class="text-muted">{{ user.username }}</span>
-                </div>
+                <a href="{% url 'mis_compras' %}" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold">🛍️ Mis Compras ({{ user.username }})</a>
+            
 
                 {% if user.is_superuser %}
                     <a href="{% url 'crear_empleado' %}" class="btn btn-outline-info btn-sm rounded-pill px-3 fw-bold">
                         👤 Nuevo Usuario
+                    </a>
+                    <a href="{% url 'lista_usuarios' %}" class="btn btn-outline-info btn-sm rounded-pill px-3 fw-bold">
+                        Registro de Usuarios
                     </a>
                 {% endif %}
 
@@ -46,20 +47,62 @@
                     <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold">Cerrar sesión</button>
                 </form>
 
+                <div class="text-end lh-1">
+                    <span class="saludo">¡Hola! </span><br>
+                    <span class="text-muted">{{ user.username }}</span>
+                </div>
+                
+
             {% else %}
                 <a href="{% url 'login' %}" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold">🔑 Ingresar</a>
             {% endif %}
+            {% if user.is_authenticated and user.groups.all.0.name == 'Financiero' or user.is_superuser %}
+                
+                <div style="display: flex; gap: 10px; margin: 10px; padding: 10px; border: 1px dashed #9BC7EC;">
+                    <span style="color: #7FC6D7; font-weight: bold;">Panel Financiero:</span>
+                    
+                    <a href="{% url 'reporte_financiero' %}" 
+                    style="background-color: #9BC7EC; color: white; padding: 5px 15px; border-radius: 4px; text-decoration: none;">
+                    Ver Balance
+                    </a>
+
+                    <a href="{% url 'configuracion_iva' %}" 
+                    style="background-color: #7FC6D7; color: white; padding: 5px 15px; border-radius: 4px; text-decoration: none;">
+                    Configurar IVA
+                    </a>
+                </div>
+
+            {% endif %}
+            {% if user.is_authenticated and 'Administrador' in user.groups.all.0.name %}
+                <div style="background-color: #F0F9FF; padding: 15px; border: 2px solid #9BC7EC; border-radius: 10px; margin: 15px 0;">
+                    <strong style="color: #5a8da0; display: block; margin-bottom: 10px;">🛠️ PANEL DE CONTROL ADMINISTRATIVO</strong>
+                    
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <a href="{% url 'reporte_financiero' %}" style="background-color: #9BC7EC; color: white; padding: 8px 12px; border-radius: 5px; text-decoration: none; font-weight: bold;">📊 Finanzas</a>
+                        <a href="{% url 'configuracion_iva' %}" style="background-color: #9BC7EC; color: white; padding: 8px 12px; border-radius: 5px; text-decoration: none;">⚙️ IVA</a>
+
+                        <a href="{% url 'gestion_bodega' %}" style="background-color: #7FC6D7; color: white; padding: 8px 12px; border-radius: 5px; text-decoration: none; font-weight: bold;">📦 Bodega</a>
+                        <a href="{% url 'crear_producto' %}" style="background-color: #7FC6D7; color: white; padding: 8px 12px; border-radius: 5px; text-decoration: none;">➕ Nuevo Producto</a>
+
+                        <a href="{% url 'gestionar_cupones' %}" style="background-color: #AFD6F8; color: #5a8da0; padding: 8px 12px; border-radius: 5px; text-decoration: none; font-weight: bold; border: 1px solid #9BC7EC;">🎟️ Cupones</a>
+                    </div>
+                </div>
+            {% endif %}
+
+            
+        
+
         </div>
     </nav>
 </header>
-
+<div class="container my-5">
+    
+</div>
 <section class="newsletter-banner">
     <img src="static/css/img/banner_skincare.png" alt="Skincare Banner" class="img-banner-full">
 </section>>
+{% block contenido %}{% endblock %}
 
-<div class="container my-5">
-    {% block contenido %}{% endblock %}
-</div>
 
 <footer class="bg-white text-muted text-center py-4 border-top">
     © 2026 Tienda Django

@@ -1,0 +1,19 @@
+<div class="factura-box" style="border: 1px solid #eee; padding: 20px;">
+    <h2>FACTURA DIGITAL #{{ pedido.id }}</h2>
+    <p>Cliente: {{ pedido.cliente.username }}</p>
+    <p>Dirección: {{ pedido.direccion_envio }}</p>
+    <hr>
+    <table>
+        {% for item in items %}
+        <tr>
+            <td>{{ item.producto.nombre }} x {{ item.cantidad }}</td>
+            <td>${{ item.precio_unitario }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <hr>
+    <p>Subtotal: ${{ pedido.subtotal }}</p>
+    <p>Descuento: -${{ pedido.descuento }}</p>
+    <p>IVA ({{ pedido.iva_aplicado }}%): ${{ iva_total }}</p>
+    <h3>TOTAL: ${{ pedido.total }}</h3>
+</div>

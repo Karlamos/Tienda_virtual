@@ -26,5 +26,11 @@ urlpatterns = [
     path('eliminar-carrito/<int:producto_id>/', eliminar_del_carrito, name='eliminar_carrito'),
     path('actualizar-carrito/<int:producto_id>/', actualizar_carrito, name='actualizar_carrito'),
     path('pagar/', procesar_pago, name='procesar_pago'),
+    path('factura/<int:pedido_id>/', ver_factura, name='ver_factura'),
+    path('configuracion-iva/', configuracion_iva, name='configuracion_iva'),
+    path('orden-despacho/<int:pedido_id>/', imprimir_orden_despacho, name='imprimir_orden_despacho'),
+    path('mis-compras/', mis_compras, name='mis_compras'),
+    path('admin-tienda/cupones/', gestionar_cupones, name='gestionar_cupones'),
+    path('usuarios/estado/<int:usuario_id>/', alternar_estado_usuario, name='alternar_estado_usuario'),
 ]
 

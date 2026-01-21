@@ -44,9 +44,20 @@
                             {% endif %}
                         </td>
                         <td>
-                            <button class="btn btn-sm btn-outline-primary">Editar</button>
-                        </td>
-                    </tr>
+                        <div class="btn-group">
+                                {% if usuario.id != request.user.id %}
+                                    <a href="{% url 'alternar_estado_usuario' usuario.id %}" 
+                                    class="btn btn-sm {% if usuario.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %}">
+                                        {% if usuario.is_active %}
+                                            🚫 Desactivar
+                                        {% else %}
+                                            ✅ Activar
+                                        {% endif %}
+                                    </a>
+                                {% else %}
+                                    <span class="badge bg-light text-muted border">Eres tú (Activo)</span>
+                                {% endif %}
+                            </div>
                     {% endfor %}
                 </tbody>
             </table>
